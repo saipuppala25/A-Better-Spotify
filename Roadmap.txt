@@ -1,1 +1,4 @@
+For our Roadmap we want to group our issues into different sprints.
 
+The first sprint will contain issues 1,2,8,9,11 as they are the basics of our program, dealing with account and user implementations.
+The second sprint will contain issues 3,5,10,16,20  and will revolve arround general playlist generation and editing.
