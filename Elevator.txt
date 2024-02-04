@@ -1,1 +1,9 @@
-This is a quick test to make sure that pulling and pushing is working correctly.
+Product Vision: 
+
+Our product is a better spotify. Users will log in with their already made spotify premium accounts and we will be able to get their data from Spotify themselves.
+From there, they will be able to see their own data with a better visual with tracked stats. Users will be able to create spotify playlists directly from our website
+based on their previous listening statistics based on genre, artist, or type of music. Since they aren't making new logins for our website specifically, we will not be
+storing any user data in order to protect our users. Theoretically, someone can log in to our application, check out their listening history for the past month and 
+make a playlist based on all of the songs that they played in the last month and listen to that playlist within a short period of time of being on our web application.
+
+
