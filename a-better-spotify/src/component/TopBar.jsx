@@ -159,6 +159,7 @@ function TopBar() {
           </Toolbar>
         </Container>
       </AppBar>
+      <Toolbar />
     </React.Fragment>
     
   );
