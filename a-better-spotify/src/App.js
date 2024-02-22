@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Login from './Login';
 import './App.css';
+import Home from './pages/Home';
 
 function App() {
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState('sadaffas');
 
   useEffect(() => {
     async function getToken() {
@@ -20,14 +21,8 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <div className="container">
-        <h1>A Better Spotify</h1>
-        <p>Welcome to your improved music experience!</p>
-        {(token === '') ? <Login /> : <p>User is authenticated</p>}
-      </div>
-    </div>
-  );
+    (token === '' || token ==null) ? <Login /> : <Home/>
+  )
 }
 
 export default App;

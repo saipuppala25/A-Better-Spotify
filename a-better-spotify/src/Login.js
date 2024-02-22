@@ -19,12 +19,19 @@ function Login() {
 
     return (
         <div className="App">
-            <header className="App-header">
-                <a className="btn-spotify" href={authUrl}>
-                    Click here to login!
-                </a>
-            </header>
+            <div className="container">
+                <h1>A Better Spotify</h1>
+                <p>Welcome to your improved music experience!</p>
+                <div className="App">
+                    <header className="App-header">
+                        <a className="btn-spotify" href={authUrl}>
+                            Click here to login!
+                        </a>
+                    </header>
+                </div>
+            </div>
         </div>
+        
     );
 }
 
