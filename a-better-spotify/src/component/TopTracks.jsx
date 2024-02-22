@@ -62,7 +62,7 @@ function TopTracks({token}){
             variant="h6"
             component="h2"
             align='center'>
-                Top {num} Tracks
+                {(tracks!==undefined?"Top "+num+" Tracks":"Get New Token")}
             </Typography>
             <TableContainer>
                 <Table>
@@ -91,6 +91,8 @@ function TopTracks({token}){
             <Typography variant="body1" fontWeight={"light"} gutterBottom></Typography>
             <FormControl variant="outlined" className="form-control">
               <TextField
+                focused
+                color='primary'
                 className="num-input"
                 // id="outlined-number"
                 label="Number"
@@ -98,7 +100,7 @@ function TopTracks({token}){
                 InputLabelProps={{
                   shrink: true,
                 }}
-                variant="outlined"
+                variant="filled"
                 value={num}
                 onChange={(e) => setNum(e.target.value)}
               />
