@@ -1,5 +1,6 @@
 import React from 'react';
 import './visuals.css';
+import TopBar from "./component/TopBar"
 
 
 import explicitVsNonexplicit from './Visualizations/graphs/explicit_vs_nonexplicit.png';
@@ -11,6 +12,7 @@ import topSongsByPlays from './Visualizations/graphs/top_songs_by_plays.png';
 function Visuals() {
   return (
     <div className="visuals-container">
+      <TopBar/>
       <h2>Stats</h2>
       <div className="grid-container">
         <div className="grid-item">
