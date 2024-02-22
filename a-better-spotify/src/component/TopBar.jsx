@@ -13,8 +13,10 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import CssBaseline from '@mui/material/CssBaseline';
+import Link from '@mui/material/Link';
 
 const pages = ['Reccomendations', 'Playlists', 'Insights'];
+const hrefs =['/home','/home','/visuals']
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function TopBar() {
@@ -89,9 +91,11 @@ function TopBar() {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                {pages.map((page) => (
+                {pages.map((page,index) => (
                   <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
+                    <Link href={hrefs[index]} underline="none">
+                      {page}
+                    </Link>
                   </MenuItem>
                 ))}
               </Menu>
@@ -116,11 +120,12 @@ function TopBar() {
               LOGO
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
+              {pages.map((page,index) => (
                 <Button
                   key={page}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
+                  href={hrefs[index]}
                 >
                   {page}
                 </Button>

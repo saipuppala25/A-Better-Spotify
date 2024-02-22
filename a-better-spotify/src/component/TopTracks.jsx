@@ -20,7 +20,7 @@ import {
   } from '@mui/material'
 
 
-function TopTracks({token}){
+function TopTracks({token, setToken}){
 
     const [tracks, setTracks] = useState([]);
     const [num, setNum] = useState(5);
@@ -39,15 +39,16 @@ function TopTracks({token}){
       }, []);
 
     async function getTracks() {
-        const topTracks = await getTopTracks();
-        setTracks(topTracks)
-        console.log(topTracks);
-        console.log(
-          topTracks?.map(
-            ({name, artists}) =>
-              `${name} by ${artists.map(artist => artist.name).join(', ')}`
-          )
-        );
+      console.log(token)
+      const topTracks = await getTopTracks();
+      setTracks(topTracks)
+      console.log(topTracks);
+      console.log(
+        topTracks?.map(
+          ({name, artists}) =>
+            `${name} by ${artists.map(artist => artist.name).join(', ')}`
+        )
+      );
     }
 
       useEffect(() => {
