@@ -29,6 +29,7 @@ function App() {
         <Route path="/visuals" element={<Visuals />} />
       </Routes>
     </Router>
+    
   );
 }
 
