@@ -1,6 +1,7 @@
 const express = require('express')
 const request = require('request');
 const dotenv = require('dotenv');
+const cors = require('cors'); // Run `npm install cors`
 
 const port = 5000
 
@@ -24,6 +25,7 @@ var generateRandomString = function (length) {
 };
 
 var app = express();
+app.use(cors());
 
 app.get('/auth/login', (req, res) => {
 
