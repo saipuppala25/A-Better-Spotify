@@ -33,7 +33,7 @@ function TopTracks({token, setToken}){
         token, 'v1/me/top/tracks?time_range=long_term&limit='+num, 'GET'
     )).items;
     }
-    
+
     useEffect(() => {
         getTracks();
       }, []);
@@ -49,6 +49,25 @@ function TopTracks({token, setToken}){
             `${name} by ${artists.map(artist => artist.name).join(', ')}`
         )
       );
+    }
+
+
+    async function handleCreatePlaylist() {
+      // const tracksUri = tracks.map(track => track.uri);
+      const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET')
+      //user id is starting to work
+      console.log("User ID:", user_id);
+      console.log("Token: ", token)
+      //This is word for word what they have on the example, so I don't know what's wrong.
+      //403	Forbidden - The server understood the request, but is refusing to fulfill it.
+      // const playlist = await fetchWebApi(
+      //    token,
+      //   `v1/users/${user_id}/playlists`, 'POST', {
+      //     "name": "My recommendation playlist",
+      //     "description": "Playlist created by the tutorial on developer.spotify.com",
+      //     "public": false
+      // })
+
     }
 
       useEffect(() => {
@@ -106,6 +125,7 @@ function TopTracks({token, setToken}){
                 onChange={(e) => setNum(e.target.value)}
               />
             </FormControl>
+            <Button onClick={handleCreatePlaylist}>Create Playlist</Button>
         </div>
         
         

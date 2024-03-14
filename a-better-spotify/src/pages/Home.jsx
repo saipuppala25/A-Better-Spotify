@@ -4,7 +4,8 @@ import TopTracks from "../component/TopTracks"
 import RecommendedTracks from "../component/RecommendedTracks";
 
 function Home({token, setToken}){
-
+    
+    
     return (
         <>
             <TopBar/>
