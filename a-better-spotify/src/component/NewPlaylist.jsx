@@ -113,7 +113,7 @@ function TopTracks({token, setToken}){
             variant="h6"
             component="h2"
             align='center'>
-                {(!ratelimit?"Reccomendations":"Reccomendations (API Rate Limited Please Wait)")}
+                {(!ratelimit?"Recommendation":"Recommendation (API Rate Limited Please Wait)")}
             </Typography>
             <TableContainer>
                 <Table>
@@ -156,42 +156,40 @@ function TopTracks({token, setToken}){
                 onChange={(e) => setNum(e.target.value)}
               />
             </FormControl>
-            <Typography id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            align='center'>Create Playlist of</Typography>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={(e) => {
-                createPlaylist("top")
-              }}
-            >
-              Recently Played
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={(e) => {
-                createPlaylist("rec")
-              }}
-            >
-              Recomendations
-            </Button>
-            <Typography
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            align='center'>
-                Playlist
-            </Typography>
+            <div style={{display: "flex"}}>
+              <Typography id="modal-modal-title"
+              style={{marginRight: "10px"}}
+              variant="h6"
+              component="h2"
+              align='center'>Create Playlist of </Typography>
+              <Button
+                variant="contained"
+                style={{marginRight: "10px"}}
+                startIcon={<AddIcon />}
+                onClick={(e) => {
+                  createPlaylist("top")
+                }}
+              >
+                Recently Played
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={(e) => {
+                  createPlaylist("rec")
+                }}
+              >
+                Recomendations
+              </Button>
+            </div>
+            
             {hasPlay!=[] && (
               <iframe
               title="Spotify Embed: Recommendation Playlist "
               src={`https://open.spotify.com/embed/playlist/${playlist.id}?utm_source=generator&theme=0`  }
               width="100%"
               height="100%"
-              style={{ maxHeight: '352px' }}
+              style={{marginTop:"10px", maxHeight: '360px', marginBottom:"10px" }}
               frameBorder="0"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"
