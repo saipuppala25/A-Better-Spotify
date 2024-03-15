@@ -10,12 +10,12 @@ import os
 from flask import Flask, jsonify, send_file, render_template
 from flask_cors import CORS
 
-app = Flask(__name__, static_url_path='/static', static_folder='Visualizations/graphs')
+app = Flask(__name__, static_url_path='/static', static_folder='graphs')
 CORS(app)
 
 def generate_images(json_path):
-    if not os.path.exists('graphs'):
-        os.makedirs('graphs')
+    if not os.path.exists('static/graphs'):
+        os.makedirs('static/graphs')
 
     with open(json_path, "r") as file:
         # had to do it line by line. I don't know why it was different.
@@ -79,7 +79,7 @@ def generate_images(json_path):
     explicit_counts = merged['explicit'].value_counts()
     plt.pie(explicit_counts, labels=explicit_counts.index, autopct='%1.1f%%', startangle=90, colors=['lightcoral', 'lightskyblue'])
     plt.title('Explicit vs Non-Explicit Tracks')
-    plt.savefig('graphs/explicit_vs_nonexplicit.png')  # Save the pie chart as an image
+    plt.savefig('static/graphs/explicit_vs_nonexplicit.png')  # Save the pie chart as an image
     plt.close()  # Close the current figure
 
     sns.set(style='whitegrid')
@@ -91,7 +91,7 @@ def generate_images(json_path):
     plt.ylabel('Artist Name')
     plt.title('Top 25 Most Played Artists by Total Listening Time')
     plt.tight_layout()
-    plt.savefig('graphs/top_artists_total_listening_time.png')  # Save the bar chart as an image
+    plt.savefig('static/graphs/top_artists_total_listening_time.png')  # Save the bar chart as an image
     plt.close()  # Close the current figure
 
     # Barchart for most played songs.
@@ -107,7 +107,7 @@ def generate_images(json_path):
     # Rotate x-axis labels for better readability
     plt.xticks(rotation=45, ha='right')
 
-    plt.savefig('graphs/top_songs_by_plays.png')  # Save the bar chart as an image
+    plt.savefig('static/graphs/top_songs_by_plays.png')  # Save the bar chart as an image
     plt.close()  # Close the current figure
 
     # Total Plays by day
@@ -133,7 +133,7 @@ def generate_images(json_path):
     plt.ylabel("Plays")
     plt.gca().yaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
 
-    plt.savefig('graphs/listens_per_hour.png')  # Save the line plot as an image
+    plt.savefig('static/graphs/listens_per_hour.png')  # Save the line plot as an image
     plt.close()  # Close the current figure
 
     image_dir = 'graphs'
@@ -146,13 +146,14 @@ def generate_images(json_path):
     # Construct image URLs
     backend_url = "http://localhost:5000"  # Change this to your backend URL
     image_urls = {key: f"{backend_url}/{key}" for key in image_paths}
+    print(key for key in image_paths)
     return image_urls
 
 # Route to generate image URLs
 @app.route('/api/visuals', methods=['GET'])
 def generate_images_endpoint():
     image_urls = generate_images("data/spotify_artist_2017-06-30.json")
-    return jsonify(image_urls)
+    return image_urls
 
 # Route to display individual images
 @app.route('/image/<image_name>')

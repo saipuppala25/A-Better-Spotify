@@ -25,6 +25,7 @@ function Visuals() {
       if (!response.ok) {
         throw new Error('Failed to fetch image URLs');
       }
+      console.log(response);
       const data = await response.json();
       setImageUrls(data);
     } catch (error) {
@@ -40,6 +41,7 @@ function Visuals() {
   // Function to handle image click and redirect to individual image page
   const handleImageClick = (imageKey) => {
     window.location.href = `/image/${imageKey}`;
+    console.log(imageKey);
   };
 
   // Render the component with images and their respective URLs
