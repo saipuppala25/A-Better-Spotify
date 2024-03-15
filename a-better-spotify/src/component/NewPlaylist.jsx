@@ -25,6 +25,7 @@ function TopTracks({token, setToken}){
     const [ids, setIds] = useState([])
     const [recommendations, setRecommendations] = useState([])
     const [playlist, setPlaylist] = useState([])
+    const [hasPlay, setHasPlay] = useState(false)
     const [num, setNum] = useState(5);
 
     
@@ -87,6 +88,7 @@ function TopTracks({token, setToken}){
       );
       setPlaylist(playlst)
       console.log(playlst)
+      setHasPlay(true)
       return playlst;
     }
 
@@ -174,7 +176,7 @@ function TopTracks({token, setToken}){
             align='center'>
                 Playlist
             </Typography>
-            {playlist!=[] && (
+            {hasPlay!=[] && (
               <iframe
               title="Spotify Embed: Recommendation Playlist "
               src={`https://open.spotify.com/embed/playlist/${playlist.id}?utm_source=generator&theme=0`  }
@@ -184,7 +186,7 @@ function TopTracks({token, setToken}){
               frameBorder="0"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"
-            />
+              />
             )}
         </div>
         
