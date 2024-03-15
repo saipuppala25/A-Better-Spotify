@@ -20,54 +20,48 @@ import {
   } from '@mui/material'
 
 
-function TopTracks({token, setToken}){
+function RecommendedTracks({token, setToken}){
 
     const [tracks, setTracks] = useState([]);
     const [num, setNum] = useState(5);
 
-    
-      
-    async function getTopTracks(){
-    // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
-    return (await fetchWebApi(
-        token, 'v1/me/top/tracks?time_range=long_term&limit='+num, 'GET'
-    )).items;
-    }
+    const topTracksIds = [
+        '4daEMLSZCgZ2Mt7gNm2SRa','0CO9NL5n0ghKfuUFE6Mbe9','38gZVjeaeR3gcnCzziAxBm','6wXPV6dNRAhFavrRaCdMXT','0KcP7Aq84oxeGe6xq1Sz93'
+      ];
 
+    async function getRecommendations(num) {
+        try {
+            const seedTracksParam = topTracksIds.slice(0, num).join(',');
+            // Endpoint reference: https://developer.spotify.com/documentation/web-api/reference/get-recommendations
+            const response = await fetchWebApi(
+                token,
+                `v1/recommendations?limit=${num}&seed_tracks=${seedTracksParam}`,
+                'GET'
+            );
+            return response.tracks;
+        } catch (error) {
+            console.error('Error fetching recommended tracks:', error);
+            return []; // Return an empty array in case of error
+        }
+    }
+    
+       
+    
     useEffect(() => {
         getTracks();
       }, []);
 
     async function getTracks() {
       console.log(token)
-      const topTracks = await getTopTracks();
-      setTracks(topTracks)
-      console.log(topTracks);
+      const recommendedTracks = await getRecommendations(num); // Pass the num parameter to getRecommendations
+      setTracks(recommendedTracks)
+      console.log(recommendedTracks);
       console.log(
-        topTracks?.map(
+        recommendedTracks?.map(
           ({name, artists}) =>
             `${name} by ${artists.map(artist => artist.name).join(', ')}`
         )
       );
-    }
-
-
-    async function handleCreatePlaylist() {
-      // const tracksUri = tracks.map(track => track.uri);
-      const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET')
-      //user id is starting to work
-      console.log("User ID:", user_id);
-      console.log("Token: ", token)
-      //This is word for word what they have on the example, so I don't know what's wrong.
-      //403	Forbidden - The server understood the request, but is refusing to fulfill it.
-      // const playlist = await fetchWebApi(
-      //    token,
-      //   `v1/users/${user_id}/playlists`, 'POST', {
-      //     "name": "My recommendation playlist",
-      //     "description": "Playlist created by the tutorial on developer.spotify.com",
-      //     "public": false
-      // })
-
     }
 
       useEffect(() => {
@@ -82,7 +76,7 @@ function TopTracks({token, setToken}){
             variant="h6"
             component="h2"
             align='center'>
-                {(tracks!==undefined?"Top "+num+" Tracks":"Get New Token")}
+                {(tracks!==undefined?"Recommended "+num+" Tracks":"Recommended Tracks")}
             </Typography>
             <TableContainer>
                 <Table>
@@ -125,10 +119,9 @@ function TopTracks({token, setToken}){
                 onChange={(e) => setNum(e.target.value)}
               />
             </FormControl>
-            <Button onClick={handleCreatePlaylist}>Create Playlist</Button>
         </div>
         
         
     );
 }
-export default TopTracks;
+export default RecommendedTracks;
