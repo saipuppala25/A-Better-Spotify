@@ -26,6 +26,7 @@ function TopTracks({token, setToken}){
     const [recommendations, setRecommendations] = useState([])
     const [playlist, setPlaylist] = useState([])
     const [hasPlay, setHasPlay] = useState(false)
+    const [ratelimit, setRatelimit] = useState(false)
     const [num, setNum] = useState(5);
 
     
@@ -57,9 +58,7 @@ function TopTracks({token, setToken}){
       console.log(topTracks?.map(track => track.track.id))
       console.log(topTracks);
       
-      const rec = await getRecommendations();
-      setRecommendations(rec)
-      const playlst = createPlaylist(ids.map(id =>"spotify:track:"+id))
+      
     }
 
     async function createPlaylist(type){
@@ -68,7 +67,17 @@ function TopTracks({token, setToken}){
         tracksUri = tracks?.map(track =>"spotify:track:"+track.track.id)
       }
       else{
-        tracksUri = ids?.map(track =>"spotify:track:"+track)
+        const rec = null;
+        try{
+          rec = await getRecommendations();
+          setRecommendations(rec)
+          console.log(rec)
+        }catch{
+          setRatelimit(true)
+          return;
+        }
+        
+        tracksUri = rec?.map(track =>"spotify:track:"+track.id)
       }
       console.log(tracksUri)
       const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET')
@@ -104,7 +113,7 @@ function TopTracks({token, setToken}){
             variant="h6"
             component="h2"
             align='center'>
-                {(tracks!==undefined?"Reccomendations":"Get New Token")}
+                {(!ratelimit?"Reccomendations":"Reccomendations (API Rate Limited Please Wait)")}
             </Typography>
             <TableContainer>
                 <Table>
