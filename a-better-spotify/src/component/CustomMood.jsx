@@ -196,8 +196,8 @@ function CustomMood({token, setToken}){
                 </MenuItem>
                 ))} */}
             </FormControl>
-            <Stack sx={{ height: 300,marginBottom:"40px" }} spacing={1} direction="row">
-                <div>
+            <Stack sx={{ height: 300,marginBottom:"40px"}} spacing={1} direction="row">
+                <div style={{borderWidth:5}}>
                     <Typography>Acousticness</Typography>
                     <Slider
                     style={{marginLeft:"35px",marginTop:"7px"}}
@@ -228,6 +228,7 @@ function CustomMood({token, setToken}){
                         max={1}
                     />
                 </div>
+                <Divider orientation="vertical" variant="middle"  sx={{}}></Divider>
                 <div>
                     <Typography>Energy</Typography>
                     <Slider
@@ -243,6 +244,7 @@ function CustomMood({token, setToken}){
                         max={1}
                     />
                 </div>
+                <Divider orientation="vertical" variant="middle"  sx={{}}></Divider>
                 <div>
                     <Typography>Instrumentalness</Typography>
                     <Slider
@@ -258,6 +260,7 @@ function CustomMood({token, setToken}){
                         max={1}
                     />
                 </div>
+                <Divider orientation="vertical" variant="middle"  sx={{}}></Divider>
                 <div>
                     <Typography>Liveness</Typography>
                     <Slider
@@ -273,6 +276,7 @@ function CustomMood({token, setToken}){
                         max={1}
                     />
                 </div>
+                <Divider orientation="vertical" variant="middle"  sx={{}}></Divider>
                 <div>
                     <Typography>Speechiness</Typography>
                     <Slider
@@ -288,6 +292,7 @@ function CustomMood({token, setToken}){
                         max={1}
                     />
                 </div>
+                <Divider orientation="vertical" variant="middle"  sx={{}}></Divider>
                 <div>
                     <Typography>Valence</Typography>
                     <Slider
