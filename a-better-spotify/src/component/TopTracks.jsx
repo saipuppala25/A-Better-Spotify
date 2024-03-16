@@ -18,6 +18,12 @@ import {
     Typography,
     TextField,
   } from '@mui/material'
+  import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
+import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 
 function TopTracks({token, setToken}){
@@ -26,13 +32,20 @@ function TopTracks({token, setToken}){
     const [num, setNum] = useState(5);
     const [playlist, setPlaylist] = useState([])
     const [hasPlay, setHasPlay] = useState(false)
+    const [alignment, setAlignment] = React.useState('long_term');
 
+    const handleAlignment = (event, newAlignment) => {
+      if(newAlignment == null){
+        return;
+      }
+      setAlignment(newAlignment);
+    };
     
       
     async function getTopTracks(){
     // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
     return (await fetchWebApi(
-        token, 'v1/me/top/tracks?time_range=long_term&limit='+num, 'GET'
+        token, 'v1/me/top/tracks?time_range='+alignment+'&limit='+num, 'GET'
     )).items;
     }
 
@@ -51,6 +64,9 @@ function TopTracks({token, setToken}){
             `${name} by ${artists.map(artist => artist.name).join(', ')}`
         )
       );
+      if(hasPlay){
+        handleCreatePlaylist()
+      }
     }
 
 
@@ -83,7 +99,7 @@ function TopTracks({token, setToken}){
 
       useEffect(() => {
         getTracks();
-      }, [num]);
+      }, [num,alignment]);
 
 
     return (
@@ -119,24 +135,51 @@ function TopTracks({token, setToken}){
               </TableBody>
             </Table>
           </TableContainer>
-          <Typography variant="body1" fontWeight={"light"} gutterBottom></Typography>
-          <FormControl variant="outlined" className="form-control">
-            <TextField
-              focused
-              color='primary'
-              className="num-input"
-              // id="outlined-number"
-              label="Number"
-              type="number"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              variant="filled"
-              value={num}
-              onChange={(e) => setNum(e.target.value)}
-            />
-          </FormControl>
-          <Button onClick={handleCreatePlaylist}>Create Playlist</Button>
+          <div style={{display:"flex",marginTop:"10px"}}>
+            <FormControl  variant="outlined" className="form-control">
+              <TextField
+                sx={{minWidth:"249px"}}
+                fullWidth
+                focused
+                color='primary'
+                className="num-input"
+                // id="outlined-number"
+                label="Number of Songs"
+                type="number"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="filled"
+                value={num}
+                onChange={(e) => setNum(e.target.value)}
+              />
+              <ToggleButtonGroup
+                color="secondary"
+                value={alignment}
+                exclusive
+                onChange={handleAlignment}
+                aria-label="text alignment"
+              >
+                <ToggleButton value="long_term" aria-label="left aligned">
+                  12 Months
+                </ToggleButton>
+                <ToggleButton value="medium_term" aria-label="centered">
+                  6 Months
+                </ToggleButton>
+                <ToggleButton value="short_term" aria-label="right aligned">
+                  1 Month
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </FormControl>
+            <Button
+              sx={{marginLeft:"50px"}}
+              color='success'
+              variant='contained'
+              onClick={handleCreatePlaylist}>
+              Create Playlist
+            </Button>
+          </div>
+          
           {hasPlay!=[] && (
             <iframe
             title="Spotify Embed: Recommendation Playlist "

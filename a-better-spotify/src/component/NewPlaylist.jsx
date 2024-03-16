@@ -17,13 +17,18 @@ import {
   ButtonGroup,
   Typography,
   TextField,
+  Divider,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
-function TopTracks({token, setToken}){
+
+
+
+function NewPlaylist({token, setToken}){
 
     const [tracks, setTracks] = useState([]);
     const [ids, setIds] = useState([])
     const [recommendations, setRecommendations] = useState([])
+    const [subset, setSubset] = useState([])
     const [playlist, setPlaylist] = useState([])
     const [hasPlay, setHasPlay] = useState(false)
     const [ratelimit, setRatelimit] = useState(false)
@@ -40,14 +45,38 @@ function TopTracks({token, setToken}){
 
     async function getRecommendations(){
         // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-recommendations
-        return (await fetchWebApi(
-          token, `v1/recommendations?limit=` + num + `&seed_tracks=${ids.join(',')}`, `GET`
-        )).tracks;
+        console.log(["hi"].join(','))
+        let total_tracks=[]
+        console.log(Math.floor(num/Math.floor(ids.length/5))+1)
+        for(let i = 0; i<Math.floor(ids.length/5);i++){
+          console.log(ids.slice(i*5,(i+1)*5).join(','))
+          let temp = await fetchWebApi(
+            token, `v1/recommendations?limit=` + (Math.floor(num/Math.floor(ids.length/5))+1) + `&seed_tracks=${ids.slice(i*5,(i+1)*5).join(',')}`, `GET`
+          )
+          console.log(temp)
+          total_tracks = total_tracks.concat(temp.tracks)
+          console.log(total_tracks)
+        }
+        if(ids.length%5===0){
+          setRecommendations(total_tracks)
+          let shuffled = [...total_tracks].sort(() => 0.5 - Math.random());
+          let subset_temp = shuffled.slice(0, num)
+          setSubset(subset_temp)
+          return total_tracks;
+        }
+        console.log(ids.slice(Math.floor(ids.length/5)*5,(Math.floor(ids.length/5)*5)+(ids.length%5)))
+        total_tracks.concat((await fetchWebApi(
+          token, `v1/recommendations?limit=` + (Math.floor(num/Math.floor(ids.length/5))+1) + `&seed_tracks=${ids.slice(Math.floor(ids.length/5)*5,(Math.floor(ids.length/5)*5)+(ids.length%5)).join(',')}`, `GET`
+        )).tracks)
+
+        setRecommendations(total_tracks)
+        let shuffled = [...total_tracks].sort(() => 0.5 - Math.random());
+        let subset_temp = shuffled.slice(0, num)
+        setSubset(subset_temp)
+
+        return total_tracks;
       }
     
-    useEffect(() => {
-        getTracks();
-      }, []);
 
     async function getTracks() {
       console.log(token)
@@ -57,6 +86,7 @@ function TopTracks({token, setToken}){
       setIds(topTracks?.map(track => track.track.id))
       console.log(topTracks?.map(track => track.track.id))
       console.log(topTracks);
+      await getRecommendations()
       
       
     }
@@ -67,17 +97,16 @@ function TopTracks({token, setToken}){
         tracksUri = tracks?.map(track =>"spotify:track:"+track.track.id)
       }
       else{
-        const rec = null;
+        let rec = null;
         try{
           rec = await getRecommendations();
-          setRecommendations(rec)
           console.log(rec)
         }catch{
           setRatelimit(true)
           return;
         }
         
-        tracksUri = rec?.map(track =>"spotify:track:"+track.id)
+        tracksUri = subset?.map(track =>"spotify:track:"+track.id)
       }
       console.log(tracksUri)
       const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET')
@@ -127,7 +156,7 @@ function TopTracks({token, setToken}){
                     </TableHead>
                     <TableBody>
                         <>
-                            {recommendations?.map(({name,artists}) =>(
+                            {subset?.map(({name,artists}) =>(
                                 <TableRow
                                 style={{background : "#74b577"}}
                                 >
@@ -156,31 +185,34 @@ function TopTracks({token, setToken}){
                 onChange={(e) => setNum(e.target.value)}
               />
             </FormControl>
-            <div style={{display: "flex"}}>
+            <div style={{}}>
               <Typography id="modal-modal-title"
               style={{marginRight: "10px"}}
               variant="h6"
               component="h2"
               align='center'>Create Playlist of </Typography>
-              <Button
-                variant="contained"
-                style={{marginRight: "10px"}}
-                startIcon={<AddIcon />}
-                onClick={(e) => {
-                  createPlaylist("top")
-                }}
-              >
-                Recently Played
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={(e) => {
-                  createPlaylist("rec")
-                }}
-              >
-                Recomendations
-              </Button>
+              <ButtonGroup disableElevation variant="outlined" aria-label="Basic button group">
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={(e) => {
+                    createPlaylist("top")
+                  }}
+                >
+                  Recently Played
+                </Button>
+                <Divider orientation="vertical" flexItem sx={{ borderRightWidth: 2, bgcolor:"Green" }}></Divider>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={(e) => {
+                    createPlaylist("rec")
+                  }}
+                >
+                  Recomendations
+                </Button>
+              </ButtonGroup>
+              
             </div>
             
             {hasPlay!=[] && (
@@ -200,4 +232,4 @@ function TopTracks({token, setToken}){
         
     );
 }
-export default TopTracks;
+export default NewPlaylist;
