@@ -4,7 +4,6 @@ import Login from './Login';
 import Home from './pages/Home';
 import Visuals from './Visuals';
 import './App.css';
-
 function App() {
   // Set the initial token state to the provided value
   const [token, setToken] = useState('');
