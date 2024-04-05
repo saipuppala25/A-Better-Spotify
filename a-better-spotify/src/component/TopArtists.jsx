@@ -1,142 +1,135 @@
 import React, { useState, useEffect } from 'react';
 import { fetchWebApi } from "../service/apiService";
 import {
-    Button,
+    Box,
+    Typography,
     TableContainer,
     Table,
     TableHead,
     TableBody,
     TableRow,
     TableCell,
-    IconButton,
-    Tooltip,
     FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    ButtonGroup,
-    Typography,
     TextField,
-  } from '@mui/material'
-  import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+    ButtonGroup,
+    Button,
+    CircularProgress,
+    Paper,
+    ToggleButton,
+    ToggleButtonGroup,
+} from '@mui/material';
+import { keyframes } from '@mui/system';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
-import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
+const gradientBackground = {
+    background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)',
+    borderRadius: '15px',
+    padding: '20px',
+};
 
-function TopArtists({token, setToken}){
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
 
+const AnimatedTableCell = ({ children }) => {
+    return (
+        <TableCell sx={{ animation: `${fadeIn} 0.5s ease`, fontFamily: 'Inter, sans-serif' }}>
+            {children}
+        </TableCell>
+    );
+};
+
+function TopArtists({ token, setToken }) {
     const [artists, setArtists] = useState([]);
     const [num, setNum] = useState(5);
-    const [alignment, setAlignment] = React.useState('long_term');
+    const [alignment, setAlignment] = useState('long_term');
+    const [loading, setLoading] = useState(false);
 
     const handleAlignment = (event, newAlignment) => {
-      if(newAlignment == null){
-        return;
-      }
-      setAlignment(newAlignment);
+        if (newAlignment != null) {
+            setAlignment(newAlignment);
+        }
     };
     
-      
-    async function getTopArtists(){
-    // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
-    return (await fetchWebApi(
-        token, 'v1/me/top/artists?time_range='+alignment+'&limit='+num, 'GET'
-    )).items;
+    async function getTopArtists() {
+        setLoading(true);
+        try {
+            const response = await fetchWebApi(
+                token, 'v1/me/top/artists?time_range='+alignment+'&limit='+num, 'GET'
+            );
+            setArtists(response.items);
+        } catch (error) {
+            console.error('Error fetching top artists:', error);
+            // Handle error gracefully, e.g., show a message to the user
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
-        getArtists();
-      }, []);
-
-    async function getArtists() {
-      const topArtists = await getTopArtists();
-      setArtists(topArtists)
-      console.log(topArtists);
-      console.log(
-        topArtists?.map(
-          ({name}) =>
-            `${name}`
-        )
-      );
-    }
-
-
-    useEffect(() => {
-      getArtists();
-    }, [num,alignment]);
+        getTopArtists();
+    }, [num, alignment]);
 
     return (
-        <div style={{padding: '0.8rem',background : "#53bd58" }}>
-          <Typography
-          id="modal-modal-title"
-          variant="h6"
-          component="h2"
-          align='center'>
-            {(artists!==undefined?"Top "+num+" Artists":"Get New Token")}
-          </Typography>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow
-                style={{background : "#2e7d32"}}
+        <Paper elevation={3} sx={{ ...gradientBackground, color: 'white', fontFamily: 'Inter, sans-serif' }}>
+            <Typography variant="h4" align="center" gutterBottom>
+                {loading ? 'Loading...' : (artists.length > 0 ? `Top ${num} Artists` : 'Get New Token')}
+            </Typography>
+            <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent' }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <AnimatedTableCell>
+                                <Typography variant="h6"><strong>Name</strong></Typography>
+                            </AnimatedTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {artists.map(artist => (
+                            <TableRow key={artist.id}>
+                                <AnimatedTableCell>
+                                    <Typography variant="body1">{artist.name}</Typography>
+                                </AnimatedTableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <Box mt={2} display="flex" alignItems="center" justifyContent="center">
+                <FormControl sx={{ mr: 2 }}>
+                    <TextField
+                        label="Number of Artists"
+                        type="number"
+                        variant="outlined"
+                        value={num}
+                        onChange={(e) => setNum(e.target.value)}
+                        InputProps={{
+                            style: { color: 'white', fontFamily: 'Inter, sans-serif' }
+                        }}
+                        InputLabelProps={{
+                            style: { color: 'white', fontFamily: 'Inter, sans-serif' }
+                        }}
+                    />
+                </FormControl>
+                <ToggleButtonGroup
+                    value={alignment}
+                    exclusive
+                    onChange={handleAlignment}
+                    aria-label="text alignment"
                 >
-                    <TableCell>Name</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <>
-                  {artists?.map(({name}) =>(
-                    <TableRow
-                    style={{background : "#74b577"}}
-                    >
-                      <TableCell>{name}</TableCell>
-                    </TableRow>
-                  ))}
-                </>
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <div style={{display:"flex",marginTop:"10px"}}>
-            <FormControl  variant="outlined" className="form-control">
-              <TextField
-                sx={{minWidth:"249px"}}
-                fullWidth
-                focused
-                color='primary'
-                className="num-input"
-                // id="outlined-number"
-                label="Number of Artists"
-                type="number"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                variant="filled"
-                value={num}
-                onChange={(e) => setNum(e.target.value)}
-              />
-              <ToggleButtonGroup
-                color="secondary"
-                value={alignment}
-                exclusive
-                onChange={handleAlignment}
-                aria-label="text alignment"
-              >
-                <ToggleButton value="long_term" aria-label="left aligned">
-                  12 Months
-                </ToggleButton>
-                <ToggleButton value="medium_term" aria-label="centered">
-                  6 Months
-                </ToggleButton>
-                <ToggleButton value="short_term" aria-label="right aligned">
-                  1 Month
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </FormControl>
-          </div>
-        </div>
+                    <ToggleButton value="long_term" sx={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', fontFamily: 'Inter, sans-serif' }}>12 Months</ToggleButton>
+                    <ToggleButton value="medium_term" sx={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', fontFamily: 'Inter, sans-serif' }}>6 Months</ToggleButton>
+                    <ToggleButton value="short_term" sx={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', fontFamily: 'Inter, sans-serif' }}>1 Month</ToggleButton>
+                </ToggleButtonGroup>
+            </Box>
+        </Paper>
     );
 }
 
