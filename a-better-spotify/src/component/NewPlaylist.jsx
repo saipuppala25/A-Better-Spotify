@@ -13,6 +13,9 @@ import {
   Box,
   TextField,
   FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   IconButton,
   Tooltip,
 } from '@mui/material';
@@ -23,10 +26,56 @@ function NewPlaylist({ token, setToken }) {
   const [playlist, setPlaylist] = useState(null);
   const [hasPlay, setHasPlay] = useState(false);
   const [num, setNum] = useState(5);
+  const [type, setType] = useState("");
 
   // Keep your existing logic here for fetching recommendations and creating playlists
+  async function getRecommendations(num,ids) {
+    try {
+        const seedTracksParam = ids.slice(0, num).join(',');
+        // Endpoint reference: https://developer.spotify.com/documentation/web-api/reference/get-recommendations
+        const response = await fetchWebApi(
+            token,
+            `v1/recommendations?limit=${num}&seed_tracks=${seedTracksParam}`,
+            'GET'
+        );
+        return response.tracks;
+    } catch (error) {
+        console.error('Error fetching recommended tracks:', error);
+        return []; // Return an empty array in case of error
+    }
+  }
+
+  async function getRecs(){
+    let tracks
+    let recs
+    if(type === "Top Tracks"){
+      tracks = (await fetchWebApi(
+        token, 'v1/me/top/tracks?time_range=long_term&limit=' + num, 'GET'
+      )).items;
+      let ids = tracks?.map(track => track.id)
+      recs = await getRecommendations(num,ids)
+      setRecommendations(recs)
+    }else  if(type === "Recently Played"){
+      tracks = (await fetchWebApi(
+        token, 'v1/me/player/recently-played?limit=5', 'GET'
+      )).items;
+      let ids = tracks?.map(track => track.track.id)
+      recs = await getRecommendations(num,ids)
+      setRecommendations(recs)
+    } else if(type === "Mood"){
+
+    }else{
+      return;
+    }
+  }
+
+
 
   async function createPlaylist() {
+    if(recommendations.length==0){
+      return;
+    }
+    
     let tracksUri = recommendations.map(track => `spotify:track:${track.id}`);
     
     const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET');
@@ -72,7 +121,7 @@ function NewPlaylist({ token, setToken }) {
             {recommendations.map((track, index) => (
               <TableRow key={index}>
                 <TableCell>{track.name}</TableCell>
-                <TableCell>{track.artists.join(', ')}</TableCell>
+                <TableCell>{track.artists.map((artist)=> artist.name).join(", ")}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -90,11 +139,34 @@ function NewPlaylist({ token, setToken }) {
           InputProps={{ style: { color: 'white' } }}
           sx={{ marginRight: '20px' }}
         />
+        <FormControl fullWidth size="small" variant="filled" sx={{ marginBottom: 2 }}>
+        <InputLabel id="genre-select-label">Reccomend From</InputLabel>
+        <Select
+          labelId="genre-select-label"
+          value={type}
+          onChange={(e)=>setType(e.target.value)}
+          sx={{ color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' } }}
+        >
+          
+          <MenuItem key={0} value={"Top Tracks"}>Top Tracks</MenuItem>
+          <MenuItem key={0} value={"Recently Played"}>Recently Played</MenuItem>
+          {/* <MenuItem key={0} value={"Mood"}>Mood</MenuItem> */}
+          
+        </Select>
+      </FormControl>
+        <Button 
+          variant="contained" 
+          startIcon={<AddIcon />} 
+          onClick={getRecs}
+          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' } }} // Spotify green color
+        >
+          Get Songs
+        </Button>
         <Button 
           variant="contained" 
           startIcon={<AddIcon />} 
           onClick={createPlaylist}
-          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' } }} // Spotify green color
+          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' }}} // Spotify green color
         >
           Create Playlist
         </Button>

@@ -64,6 +64,7 @@ function TopArtists({ token, setToken }) {
             const response = await fetchWebApi(
                 token, 'v1/me/top/artists?time_range='+alignment+'&limit='+num, 'GET'
             );
+            console.log(response)
             setArtists(response.items);
         } catch (error) {
             console.error('Error fetching top artists:', error);
@@ -74,8 +75,10 @@ function TopArtists({ token, setToken }) {
     }
 
     useEffect(() => {
-        getTopArtists();
-    }, [num, alignment]);
+        if(token!==""){
+            getTopArtists();
+        }
+    }, [num, alignment,token]);
 
     return (
         <Paper elevation={3} sx={{ ...gradientBackground, color: 'white', fontFamily: 'Inter, sans-serif' }}>

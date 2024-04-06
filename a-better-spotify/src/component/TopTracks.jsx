@@ -19,7 +19,7 @@ import {
 
 function TopTracks({ token, setToken }) {
   const [tracks, setTracks] = useState([]);
-  const [num, setNum] = useState(50);
+  const [num, setNum] = useState(5);
   const [playlist, setPlaylist] = useState([]);
   const [hasPlay, setHasPlay] = useState(false);
   const [alignment, setAlignment] = useState('long_term');

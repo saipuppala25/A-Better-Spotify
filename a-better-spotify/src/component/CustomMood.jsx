@@ -10,6 +10,12 @@ import {
   Slider,
   Typography,
   Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@mui/material';
 
 function CustomMood({ token }) {
@@ -36,7 +42,7 @@ function CustomMood({ token }) {
   }
 
   async function getRecommendations() {
-    if (!genre) return; // Ensure a genre is selected
+    if (genre==="") return; // Ensure a genre is selected
     try {
       let queryParams = `limit=10&seed_genres=${genre}`; // Example limit, adjust as needed
       Object.entries(attributes).forEach(([key, value]) => {
@@ -52,7 +58,9 @@ function CustomMood({ token }) {
   }
 
   useEffect(() => {
-    getGenres();
+    if(token!=""){
+      getGenres();
+    }
   }, [token]);
 
   const handleGenreChange = (event) => {
@@ -112,6 +120,24 @@ function CustomMood({ token }) {
       <Button variant="contained" onClick={getRecommendations} sx={{ alignSelf: 'center', marginTop: 2 }}>
         Get Recommendations
       </Button>
+      <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent', maxHeight: 440 }}>
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell><Typography variant="h6"><strong>Name</strong></Typography></TableCell>
+              <TableCell><Typography variant="h6"><strong>Artists</strong></Typography></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {recommendations.map((track, index) => (
+              <TableRow key={index}>
+                <TableCell>{track.name}</TableCell>
+                <TableCell>{track.artists.map((artist)=> artist.name).join(", ")}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Paper>
   );
 }
