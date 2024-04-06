@@ -26,30 +26,60 @@ function NewPlaylist({ token, setToken }) {
 
   // Keep your existing logic here for fetching recommendations and creating playlists
 
+  async function createPlaylist() {
+    let tracksUri = recommendations.map(track => `spotify:track:${track.id}`);
+    
+    const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET');
+    const playlistResponse = await fetchWebApi(
+      token,
+      `v1/users/${user_id}/playlists`, 'POST', {
+        "name": "My New Playlist",
+        "description": "A playlist created from recommendations.",
+        "public": false
+      });
+
+    await fetchWebApi(
+      token,
+      `v1/playlists/${playlistResponse.id}/tracks`, 'POST', {
+        "uris": tracksUri
+      });
+
+    setPlaylist(playlistResponse);
+    setHasPlay(true);
+  }
+
   return (
-    <Paper elevation={3} sx={{ background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)', borderRadius: '15px', padding: '20px', color: 'white', marginBottom: '20px' }}>
+    <Paper elevation={3} sx={{
+      background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)', 
+      borderRadius: '15px', 
+      padding: '20px', 
+      color: 'white', 
+      marginBottom: '20px'
+    }}>
       <Typography variant="h4" align="center" gutterBottom>
         New Playlist
       </Typography>
+      
       <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent', maxHeight: 440 }}>
-        <Table>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell><Typography variant="h6" color="inherit"><strong>Name</strong></Typography></TableCell>
-              <TableCell><Typography variant="h6" color="inherit"><strong>Artists</strong></Typography></TableCell>
+              <TableCell><Typography variant="h6"><strong>Name</strong></Typography></TableCell>
+              <TableCell><Typography variant="h6"><strong>Artists</strong></Typography></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {recommendations.map((track, index) => (
-              <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row">{track.name}</TableCell>
+              <TableRow key={index}>
+                <TableCell>{track.name}</TableCell>
                 <TableCell>{track.artists.join(', ')}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <Box mt={2} display="flex" justifyContent="space-around">
+      
+      <Box mt={2} display="flex" justifyContent="center">
         <TextField
           label="Number of Tracks"
           type="number"
@@ -58,17 +88,22 @@ function NewPlaylist({ token, setToken }) {
           onChange={(e) => setNum(e.target.value)}
           InputLabelProps={{ style: { color: 'white' } }}
           InputProps={{ style: { color: 'white' } }}
+          sx={{ marginRight: '20px' }}
         />
-        <IconButton color="primary" onClick={() => {/* Invoke playlist creation logic */}} sx={{ color: 'white' }}>
-          <Tooltip title="Create Playlist">
-            <AddIcon />
-          </Tooltip>
-        </IconButton>
+        <Button 
+          variant="contained" 
+          startIcon={<AddIcon />} 
+          onClick={createPlaylist}
+          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' } }} // Spotify green color
+        >
+          Create Playlist
+        </Button>
       </Box>
+      
       {hasPlay && playlist && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <iframe
-            title="Spotify Embed: Recommendation Playlist"
+            title="Spotify Embed: New Playlist"
             src={`https://open.spotify.com/embed/playlist/${playlist.id}?utm_source=generator`}
             width="100%"
             height="380"
