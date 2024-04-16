@@ -8,10 +8,9 @@ import TopArtists from '../component/TopArtists';
 import WebPlayback from '../component/WebPlayback';
 
 function Home({ token, setToken }) {
-    // Style for the main container to add padding at the top
-    // Adjusted paddingTop to a smaller value that should be enough to account for the TopBar height
+    // Adjusted style for the main container to improve alignment and spacing
     const mainContainerStyle = {
-      paddingTop: '500px', // Adjusted padding at the top
+      paddingTop: '100px', // Reduced top padding to better align with the TopBar
       paddingLeft: '20px',
       paddingRight: '20px',
       paddingBottom: '20px',
@@ -21,11 +20,12 @@ function Home({ token, setToken }) {
       gap: '20px',
     };
   
-    // Adjusted style for the flex items to ensure they are properly aligned and have some space between them
+    // Revised style for the flex items to position them lower on the screen and improve alignment
     const flexItemStyle = {
       maxWidth: 'calc(50% - 10px)',
       flexBasis: 'calc(50% - 10px)',
       boxSizing: 'border-box',
+      marginTop: '500px',  // Added top margin to lower the items on the screen
     };
   
     return (
@@ -33,16 +33,17 @@ function Home({ token, setToken }) {
         <TopBar />
         <div style={mainContainerStyle}>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px' }}>
-            {/* <div style={flexItemStyle}>
-              <TopTracks token={token} setToken={setToken} />
-            </div> */}
             <div style={flexItemStyle}>
               <TopArtists token={token} setToken={setToken} />
             </div>
+            {/* Uncomment other components as needed */}
             {/* <div style={flexItemStyle}>
+              <TopTracks token={token} setToken={setToken} />
+            </div>
+            <div style={flexItemStyle}>
               <NewPlaylist token={token} setToken={setToken} />
-            </div> */}
-            {/* <div style={flexItemStyle}>
+            </div>
+            <div style={flexItemStyle}>
               <CustomMood token={token} setToken={setToken} />
             </div> */}
           </div>

@@ -48,7 +48,7 @@ const AnimatedTableCell = ({ children }) => {
 
 function TopArtists({ token, setToken }) {
     const [artists, setArtists] = useState([]);
-    const [num, setNum] = useState(5);
+    const [num, setNum] = useState(50);
     const [alignment, setAlignment] = useState('long_term');
     const [loading, setLoading] = useState(false);
 
@@ -106,7 +106,7 @@ function TopArtists({ token, setToken }) {
                 </Table>
             </TableContainer>
             <Box mt={2} display="flex" alignItems="center" justifyContent="center">
-                <FormControl sx={{ mr: 2 }}>
+                {/* <FormControl sx={{ mr: 2 }}>
                     <TextField
                         label="Number of Artists"
                         type="number"
@@ -120,7 +120,7 @@ function TopArtists({ token, setToken }) {
                             style: { color: 'white', fontFamily: 'Inter, sans-serif' }
                         }}
                     />
-                </FormControl>
+                </FormControl> */}
                 <ToggleButtonGroup
                     value={alignment}
                     exclusive

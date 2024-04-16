@@ -25,7 +25,7 @@ function NewPlaylist({ token, setToken }) {
   const [recommendations, setRecommendations] = useState([]);
   const [playlist, setPlaylist] = useState(null);
   const [hasPlay, setHasPlay] = useState(false);
-  const [num, setNum] = useState(5);
+  const [num, setNum] = useState(30);
   const [type, setType] = useState("");
   const [playlistName, setPlaylistName] = useState("");
   const [playlistDescription, setPlaylistDescription] = useState("");
@@ -107,18 +107,10 @@ function NewPlaylist({ token, setToken }) {
       color: 'white',
       marginBottom: '20px'
     }}>
-      <Typography variant="h4" align="center" gutterBottom>
-        New Playlist
-      </Typography>
+
 
       <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent', maxHeight: 440 }}>
         <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell><Typography variant="h6"><strong>Name</strong></Typography></TableCell>
-              <TableCell><Typography variant="h6"><strong>Artists</strong></Typography></TableCell>
-            </TableRow>
-          </TableHead>
           <TableBody>
             {recommendations.map((track, index) => (
               <TableRow key={index}>
@@ -142,7 +134,7 @@ function NewPlaylist({ token, setToken }) {
           sx={{ marginRight: '20px' }}
         />
         <FormControl fullWidth size="small" variant="filled" sx={{ marginBottom: 2 }}>
-          <InputLabel id="genre-select-label">Reccomend From</InputLabel>
+          <InputLabel id="genre-select-label">Reccommend From</InputLabel>
           <Select
             labelId="genre-select-label"
             value={type}
@@ -160,10 +152,18 @@ function NewPlaylist({ token, setToken }) {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={getRecs}
-          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' } }} // Spotify green color
+          sx={{
+            background: 'linear-gradient(to right, #9D50BB, #6E48AA)', // Purple gradient background
+            color: 'white',
+            '&:hover': {
+              background: 'linear-gradient(to right, #9D50BB, #6E48AA)',
+              opacity: 0.9
+            }
+          }}
         >
           Get Songs
         </Button>
+
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
           <TextField
             label="Playlist Name"
@@ -188,7 +188,14 @@ function NewPlaylist({ token, setToken }) {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={createPlaylist}
-          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' } }} // Spotify green color
+          sx={{
+            background: 'linear-gradient(to right, #9D50BB, #6E48AA)', // Matching purple gradient background
+            color: 'white',
+            '&:hover': {
+              background: 'linear-gradient(to right, #9D50BB, #6E48AA)',
+              opacity: 0.9
+            }
+          }}
         >
           Create Playlist
         </Button>
