@@ -5,6 +5,7 @@ import RecommendedTracks from '../component/RecommendedTracks'; // Adjust the im
 import NewPlaylist from '../component/NewPlaylist';
 
 function RecommendationsPage({ token, setToken }) {
+  
   return (
     <div>
       {/* <RecommendedTracks token={token} setToken={setToken} /> */}

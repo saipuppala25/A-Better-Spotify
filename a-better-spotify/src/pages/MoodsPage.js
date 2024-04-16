@@ -5,10 +5,16 @@ import RecommendedTracks from "../component/RecommendedTracks"; // Adjust the im
 import CustomMood from "../component/CustomMood";
 
 function MoodsPage({ token, setToken }) {
+
+  const containerStyle = {
+    paddingTop: '250px', // Add 500px padding at the top
+    paddingLeft: '20px', // Optional left padding
+    paddingRight: '20px', // Optional right padding
+    paddingBottom: '20px', // Optional bottom padding
+  };
+
   return (
-    <div>
-      <h2>Moods</h2>
-      {/* <RecommendedTracks token={token} setToken={setToken} /> */}
+     <div style={containerStyle}>
       <CustomMood token={token} setToken={setToken} />
     </div>
   );

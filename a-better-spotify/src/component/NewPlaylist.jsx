@@ -18,32 +18,63 @@ function NewPlaylist({ token, setToken }) {
 
   // Fetch recommendations based on the selected type
   async function getRecs() {
-    let tracks, recs, ids;
-    const endpoint = type === "Top Tracks" ?
-      `v1/me/top/tracks?time_range=long_term&limit=${num}` :
-      'v1/me/player/recently-played?limit=5';
-
-    tracks = (await fetchWebApi(token, endpoint, 'GET')).items;
-    ids = tracks?.map(track => track.id);
-    recs = await getRecommendations(num, ids);
-    setRecommendations(recs);
-  }
-
-  // Fetch recommended tracks from Spotify API
-  async function getRecommendations(num, ids) {
-    const seedTracksParam = ids.slice(0, num).join(',');
+    let tracks, ids, recs;
     try {
-      const response = await fetchWebApi(
-        token,
-        `v1/recommendations?limit=${num}&seed_tracks=${seedTracksParam}`,
-        'GET'
-      );
-      return response.tracks;
+        if (type === "Top Tracks") {
+            tracks = (await fetchWebApi(
+                token, 'v1/me/top/tracks?time_range=long_term&limit=' + num, 'GET'
+            )).items;
+        } else if (type === "Recently Played") {
+            tracks = (await fetchWebApi(
+                token, 'v1/me/player/recently-played?limit=' + num, 'GET' // Increase limit for recently played tracks
+            )).items.map(item => item.track);
+        }
+
+        ids = tracks.map(track => track.id);
+        recs = await getRecommendations(num, ids);
+        setRecommendations(recs);
     } catch (error) {
-      console.error('Error fetching recommended tracks:', error);
-      return []; // Return an empty array in case of error
+        console.error('Error fetching recommendations:', error);
     }
-  }
+}
+
+  async function getRecommendations(num, ids) {
+    // Split the array of track IDs into batches of 5
+    const batches = [];
+    for (let i = 0; i < ids.length; i += 5) {
+        batches.push(ids.slice(i, i + 5));
+    }
+
+    try {
+        // Initialize an array to store recommendations from all batches
+        const allRecommendations = [];
+
+        // Send requests for each batch of seed tracks
+        for (const batch of batches) {
+            const seedTracksParam = batch.join(',');
+            const response = await fetchWebApi(
+                token,
+                `v1/recommendations?limit=${num}&seed_tracks=${seedTracksParam}`,
+                'GET'
+            );
+            const recommendations = response.tracks;
+            
+            // Merge recommendations from the current batch with previous batches
+            allRecommendations.push(...recommendations);
+            
+            // If the total number of recommendations meets or exceeds the requested limit, break the loop
+            if (allRecommendations.length >= num) {
+                break;
+            }
+        }
+
+        // Return the merged recommendations
+        return allRecommendations;
+    } catch (error) {
+        console.error('Error fetching recommended tracks:', error);
+        return []; // Return an empty array in case of error
+    }
+}
 
   // Create a new playlist on Spotify
   async function createPlaylist() {

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+
 import { fetchWebApi } from "../service/apiService";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -42,7 +43,7 @@ function CustomMood({ token }) {
   }
 
   async function getRecommendations() {
-    if (genre==="") return; // Ensure a genre is selected
+    if (genre === "") return; // Ensure a genre is selected
     try {
       let queryParams = `limit=10&seed_genres=${genre}`; // Example limit, adjust as needed
       Object.entries(attributes).forEach(([key, value]) => {
@@ -58,7 +59,7 @@ function CustomMood({ token }) {
   }
 
   useEffect(() => {
-    if(token!=""){
+    if (token) {
       getGenres();
     }
   }, [token]);
@@ -72,16 +73,16 @@ function CustomMood({ token }) {
   };
 
   return (
-    <Paper elevation={3} sx={{ 
-        background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)', 
-        borderRadius: '15px', 
-        padding: '20px', 
-        color: 'white',
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: 2, 
-        minWidth: 120, 
-        maxWidth: 500 
+    <Paper elevation={3} sx={{
+      background: 'linear-gradient(90deg, rgba(75,95,190,1) 0%, rgba(188,85,217,1) 100%)',
+      borderRadius: '15px',
+      padding: '20px',
+      color: 'white',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
+      minWidth: 120,
+      maxWidth: 500
     }}>
       <FormControl fullWidth size="small" variant="filled" sx={{ marginBottom: 2 }}>
         <InputLabel id="genre-select-label">Genre</InputLabel>
@@ -124,15 +125,15 @@ function CustomMood({ token }) {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell><Typography variant="h6"><strong>Name</strong></Typography></TableCell>
-              <TableCell><Typography variant="h6"><strong>Artists</strong></Typography></TableCell>
+              <TableCell sx={{ background: 'linear-gradient(135deg, #4B5FBE 0%, #BC55D9 100%)' }}><Typography variant="h6"><strong>Name</strong></Typography></TableCell>
+              <TableCell sx={{ background: 'linear-gradient(135deg, #4B5FBE 0%, #BC55D9 100%)' }}><Typography variant="h6"><strong>Artists</strong></Typography></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {recommendations.map((track, index) => (
               <TableRow key={index}>
-                <TableCell>{track.name}</TableCell>
-                <TableCell>{track.artists.map((artist)=> artist.name).join(", ")}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{track.name}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{track.artists.map((artist) => artist.name).join(", ")}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -1,19 +1,33 @@
-import * as React from 'react';
-import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem, Link } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  AppBar, Box, Toolbar, IconButton, Typography, Menu, Container,
+  Avatar, Button, Tooltip, MenuItem, Link
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
 
 const pages = ['Top Tracks', 'Top Artists', 'Playlists', 'Recommendations'];
-const hrefs = ['/top-tracks', '/top-artists','/playlists', '/moods'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const hrefs = ['/top-tracks', '/top-artists', '/playlists', '/moods'];
 
-function TopBar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+function TopBar({ token, setToken }) {
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      fetchUserProfile(token).then(data => {
+        setUserProfile(data);
+      }).catch(error => {
+        console.error('Error fetching user profile:', error);
+      });
+    }
+  }, [token]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -26,10 +40,25 @@ function TopBar() {
     setAnchorElUser(null);
   };
 
+  const handleLogout = () => {
+    setToken(null); // Clears the user token
+    setUserProfile(null); // Clears user data
+    // Optionally redirect to login or do additional cleanup
+  };
+
+  const fetchUserProfile = async (token) => {
+    const headers = new Headers({
+      Authorization: `Bearer ${token}`
+    });
+
+    const response = await fetch('https://api.spotify.com/v1/me', { headers });
+    const data = await response.json();
+    return data;
+  };
+
   return (
     <React.Fragment>
-    <AppBar position="fixed" color="success" sx={{ background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)' }}>
-
+      <AppBar position="fixed" color="success" sx={{ background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)' }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <Typography
@@ -88,23 +117,7 @@ function TopBar() {
                 ))}
               </Menu>
             </Box>
-            <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-            <Typography
-                variant="h6"
-                noWrap
-                component="a"
-                href="#responsive"
-                sx={{
-                  mr: 2,
-                  display: { xs: 'none', md: 'flex' },
-                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-                  fontWeight: 700,
-                  letterSpacing: '.1rem',
-                  color: 'inherit',
-                   textDecoration: 'none',
-                   }}
-            >
-            </Typography>
+
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page, index) => (
                 <Button
@@ -121,7 +134,7 @@ function TopBar() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt="User Avatar" src={userProfile?.images[0]?.url || '/static/images/avatar/default.jpg'} />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -140,11 +153,9 @@ function TopBar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
+                <MenuItem onClick={handleLogout}>
+                  <Typography textAlign="center">Logout</Typography>
+                </MenuItem>
               </Menu>
             </Box>
           </Toolbar>
