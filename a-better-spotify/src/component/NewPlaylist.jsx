@@ -27,71 +27,73 @@ function NewPlaylist({ token, setToken }) {
   const [hasPlay, setHasPlay] = useState(false);
   const [num, setNum] = useState(5);
   const [type, setType] = useState("");
+  const [playlistName, setPlaylistName] = useState("");
+  const [playlistDescription, setPlaylistDescription] = useState("");
 
   // Keep your existing logic here for fetching recommendations and creating playlists
-  async function getRecommendations(num,ids) {
+  async function getRecommendations(num, ids) {
     try {
-        const seedTracksParam = ids.slice(0, num).join(',');
-        // Endpoint reference: https://developer.spotify.com/documentation/web-api/reference/get-recommendations
-        const response = await fetchWebApi(
-            token,
-            `v1/recommendations?limit=${num}&seed_tracks=${seedTracksParam}`,
-            'GET'
-        );
-        return response.tracks;
+      const seedTracksParam = ids.slice(0, num).join(',');
+      // Endpoint reference: https://developer.spotify.com/documentation/web-api/reference/get-recommendations
+      const response = await fetchWebApi(
+        token,
+        `v1/recommendations?limit=${num}&seed_tracks=${seedTracksParam}`,
+        'GET'
+      );
+      return response.tracks;
     } catch (error) {
-        console.error('Error fetching recommended tracks:', error);
-        return []; // Return an empty array in case of error
+      console.error('Error fetching recommended tracks:', error);
+      return []; // Return an empty array in case of error
     }
   }
 
-  async function getRecs(){
-    let tracks
-    let recs
-    if(type === "Top Tracks"){
+  async function getRecs() {
+    let tracks;
+    let recs;
+    if (type === "Top Tracks") {
       tracks = (await fetchWebApi(
         token, 'v1/me/top/tracks?time_range=long_term&limit=' + num, 'GET'
       )).items;
       let ids = tracks?.map(track => track.id)
-      recs = await getRecommendations(num,ids)
+      recs = await getRecommendations(num, ids)
       setRecommendations(recs)
-    }else  if(type === "Recently Played"){
+    } else if (type === "Recently Played") {
       tracks = (await fetchWebApi(
         token, 'v1/me/player/recently-played?limit=5', 'GET'
       )).items;
       let ids = tracks?.map(track => track.track.id)
-      recs = await getRecommendations(num,ids)
+      recs = await getRecommendations(num, ids)
       setRecommendations(recs)
-    } else if(type === "Mood"){
+    } else if (type === "Mood") {
 
-    }else{
+    } else {
       return;
     }
   }
 
 
-
+  // Add ability to write name and description
   async function createPlaylist() {
-    if(recommendations.length==0){
+    if (recommendations.length === 0) {
       return;
     }
-    
+
     let tracksUri = recommendations.map(track => `spotify:track:${track.id}`);
-    
+
     const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET');
     const playlistResponse = await fetchWebApi(
       token,
       `v1/users/${user_id}/playlists`, 'POST', {
-        "name": "My New Playlist",
-        "description": "A playlist created from recommendations.",
-        "public": false
-      });
+      "name": playlistName || "My New Playlist",
+      "description": playlistDescription || "A playlist created from recommendations.",
+      "public": false
+    });
 
     await fetchWebApi(
       token,
       `v1/playlists/${playlistResponse.id}/tracks`, 'POST', {
-        "uris": tracksUri
-      });
+      "uris": tracksUri
+    });
 
     setPlaylist(playlistResponse);
     setHasPlay(true);
@@ -99,16 +101,16 @@ function NewPlaylist({ token, setToken }) {
 
   return (
     <Paper elevation={3} sx={{
-      background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)', 
-      borderRadius: '15px', 
-      padding: '20px', 
-      color: 'white', 
+      background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)',
+      borderRadius: '15px',
+      padding: '20px',
+      color: 'white',
       marginBottom: '20px'
     }}>
       <Typography variant="h4" align="center" gutterBottom>
         New Playlist
       </Typography>
-      
+
       <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent', maxHeight: 440 }}>
         <Table stickyHeader>
           <TableHead>
@@ -121,13 +123,13 @@ function NewPlaylist({ token, setToken }) {
             {recommendations.map((track, index) => (
               <TableRow key={index}>
                 <TableCell>{track.name}</TableCell>
-                <TableCell>{track.artists.map((artist)=> artist.name).join(", ")}</TableCell>
+                <TableCell>{track.artists.map((artist) => artist.name).join(", ")}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      
+
       <Box mt={2} display="flex" justifyContent="center">
         <TextField
           label="Number of Tracks"
@@ -140,38 +142,58 @@ function NewPlaylist({ token, setToken }) {
           sx={{ marginRight: '20px' }}
         />
         <FormControl fullWidth size="small" variant="filled" sx={{ marginBottom: 2 }}>
-        <InputLabel id="genre-select-label">Reccomend From</InputLabel>
-        <Select
-          labelId="genre-select-label"
-          value={type}
-          onChange={(e)=>setType(e.target.value)}
-          sx={{ color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' } }}
-        >
-          
-          <MenuItem key={0} value={"Top Tracks"}>Top Tracks</MenuItem>
-          <MenuItem key={0} value={"Recently Played"}>Recently Played</MenuItem>
-          {/* <MenuItem key={0} value={"Mood"}>Mood</MenuItem> */}
-          
-        </Select>
-      </FormControl>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />} 
+          <InputLabel id="genre-select-label">Reccomend From</InputLabel>
+          <Select
+            labelId="genre-select-label"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            sx={{ color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' } }}
+          >
+
+            <MenuItem key={0} value={"Top Tracks"}>Top Tracks</MenuItem>
+            <MenuItem key={1} value={"Recently Played"}>Recently Played</MenuItem>
+            {/* <MenuItem key={0} value={"Mood"}>Mood</MenuItem> */}
+
+          </Select>
+        </FormControl>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
           onClick={getRecs}
           sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' } }} // Spotify green color
         >
           Get Songs
         </Button>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />} 
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
+          <TextField
+            label="Playlist Name"
+            variant="outlined"
+            value={playlistName}
+            onChange={(e) => setPlaylistName(e.target.value)}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{ style: { color: 'white' } }}
+            sx={{ marginBottom: '10px' }}
+          />
+          <TextField
+            label="Playlist Description"
+            variant="outlined"
+            value={playlistDescription}
+            onChange={(e) => setPlaylistDescription(e.target.value)}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{ style: { color: 'white' } }}
+            sx={{ marginBottom: '10px' }}
+          />
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
           onClick={createPlaylist}
-          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' }}} // Spotify green color
+          sx={{ backgroundColor: '#1DB954', '&:hover': { backgroundColor: '#1DB95499' } }} // Spotify green color
         >
           Create Playlist
         </Button>
       </Box>
-      
+
       {hasPlay && playlist && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <iframe
