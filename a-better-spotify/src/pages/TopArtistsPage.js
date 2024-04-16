@@ -10,6 +10,7 @@ function TopArtistsPage({ token, setToken }) {
     paddingLeft: '20px', // Optional left padding
     paddingRight: '20px', // Optional right padding
     paddingBottom: '20px', // Optional bottom padding
+    width: '200%'
   };
 
   return (

@@ -1,25 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { fetchWebApi } from "../service/apiService";
+import React, { useState } from 'react';
 import {
-  Button,
-  Paper,
-  Typography,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Box,
-  TextField,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  IconButton,
-  Tooltip,
+  Paper, Typography, TableContainer, Table, TableHead, TableBody,
+  TableRow, TableCell, Box, TextField, FormControl, InputLabel,
+  MenuItem, Select, Button, Tooltip
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add'; // For the "Create Playlist" button
+import AddIcon from '@mui/icons-material/Add';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+import { fetchWebApi } from "../service/apiService";
 
 function NewPlaylist({ token, setToken }) {
   const [recommendations, setRecommendations] = useState([]);
@@ -27,14 +14,25 @@ function NewPlaylist({ token, setToken }) {
   const [hasPlay, setHasPlay] = useState(false);
   const [num, setNum] = useState(30);
   const [type, setType] = useState("");
-  const [playlistName, setPlaylistName] = useState("");
-  const [playlistDescription, setPlaylistDescription] = useState("");
 
-  // Keep your existing logic here for fetching recommendations and creating playlists
+
+  // Fetch recommendations based on the selected type
+  async function getRecs() {
+    let tracks, recs, ids;
+    const endpoint = type === "Top Tracks" ?
+      `v1/me/top/tracks?time_range=long_term&limit=${num}` :
+      'v1/me/player/recently-played?limit=5';
+
+    tracks = (await fetchWebApi(token, endpoint, 'GET')).items;
+    ids = tracks?.map(track => track.id);
+    recs = await getRecommendations(num, ids);
+    setRecommendations(recs);
+  }
+
+  // Fetch recommended tracks from Spotify API
   async function getRecommendations(num, ids) {
+    const seedTracksParam = ids.slice(0, num).join(',');
     try {
-      const seedTracksParam = ids.slice(0, num).join(',');
-      // Endpoint reference: https://developer.spotify.com/documentation/web-api/reference/get-recommendations
       const response = await fetchWebApi(
         token,
         `v1/recommendations?limit=${num}&seed_tracks=${seedTracksParam}`,
@@ -47,82 +45,59 @@ function NewPlaylist({ token, setToken }) {
     }
   }
 
-  async function getRecs() {
-    let tracks;
-    let recs;
-    if (type === "Top Tracks") {
-      tracks = (await fetchWebApi(
-        token, 'v1/me/top/tracks?time_range=long_term&limit=' + num, 'GET'
-      )).items;
-      let ids = tracks?.map(track => track.id)
-      recs = await getRecommendations(num, ids)
-      setRecommendations(recs)
-    } else if (type === "Recently Played") {
-      tracks = (await fetchWebApi(
-        token, 'v1/me/player/recently-played?limit=5', 'GET'
-      )).items;
-      let ids = tracks?.map(track => track.track.id)
-      recs = await getRecommendations(num, ids)
-      setRecommendations(recs)
-    } else if (type === "Mood") {
-
-    } else {
-      return;
-    }
-  }
-
-
-  // Add ability to write name and description
+  // Create a new playlist on Spotify
   async function createPlaylist() {
-    if (recommendations.length === 0) {
-      return;
-    }
-
-    let tracksUri = recommendations.map(track => `spotify:track:${track.id}`);
+    if (!recommendations.length) return;
 
     const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET');
     const playlistResponse = await fetchWebApi(
-      token,
-      `v1/users/${user_id}/playlists`, 'POST', {
-      "name": playlistName || "My New Playlist",
-      "description": playlistDescription || "A playlist created from recommendations.",
-      "public": false
-    });
+      token, `v1/users/${user_id}/playlists`, 'POST', {
+        name: "My New Playlist",
+        description: "A playlist created from recommendations.",
+        public: false
+      });
 
+    const tracksUri = recommendations.map(track => `spotify:track:${track.id}`);
     await fetchWebApi(
       token,
-      `v1/playlists/${playlistResponse.id}/tracks`, 'POST', {
-      "uris": tracksUri
-    });
+      `v1/playlists/${playlistResponse.id}/tracks`, 'POST', { uris: tracksUri });
 
     setPlaylist(playlistResponse);
     setHasPlay(true);
   }
 
+  const cellStyle = {
+    background: 'linear-gradient(to right, #6E48AA, #9D50BB)', // Purple gradient background
+    color: 'white'
+  };
+
+
   return (
-    <Paper elevation={3} sx={{
-      background: 'linear-gradient(90deg, #4B5FBE 0%, #BC55D9 100%)',
-      borderRadius: '15px',
-      padding: '20px',
-      color: 'white',
-      marginBottom: '20px'
-    }}>
-
-
-      <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent', maxHeight: 440 }}>
+    <Paper elevation={3} sx={{ background: 'linear-gradient(to right, #4B5FBE 0%, #BC55D9 100%)', borderRadius: '15px', padding: '20px', color: '#fff', marginBottom: '20px', overflow: 'hidden' }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Create New Playlist
+      </Typography>
+      
+      <TableContainer component={Paper} elevation={0} sx={{ backgroundColor: 'transparent', maxHeight: 440, overflow: 'auto' }}>
         <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell style={cellStyle}><Typography variant="h6" fontWeight="medium">Name</Typography></TableCell>
+              <TableCell style={cellStyle}><Typography variant="h6" fontWeight="medium">Artists</Typography></TableCell>
+            </TableRow>
+          </TableHead>
           <TableBody>
             {recommendations.map((track, index) => (
               <TableRow key={index}>
-                <TableCell>{track.name}</TableCell>
-                <TableCell>{track.artists.map((artist) => artist.name).join(", ")}</TableCell>
+                <TableCell style={cellStyle}>{track.name}</TableCell>
+                <TableCell style={cellStyle}>{track.artists.map(artist => artist.name).join(", ")}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Box mt={2} display="flex" justifyContent="center">
+      
+      <Box mt={2} display="flex" justifyContent="center" gap={2}>
         <TextField
           label="Number of Tracks"
           type="number"
@@ -131,76 +106,49 @@ function NewPlaylist({ token, setToken }) {
           onChange={(e) => setNum(e.target.value)}
           InputLabelProps={{ style: { color: 'white' } }}
           InputProps={{ style: { color: 'white' } }}
-          sx={{ marginRight: '20px' }}
         />
-        <FormControl fullWidth size="small" variant="filled" sx={{ marginBottom: 2 }}>
-          <InputLabel id="genre-select-label">Reccommend From</InputLabel>
+        <FormControl variant="filled" fullWidth size="small" sx={{ '.MuiFilledInput-root': { bgcolor: 'rgba(255, 255, 255, 0.09)', color: 'white' } }}>
+          <InputLabel id="type-select-label" sx={{ color: 'white' }}>Recommend From</InputLabel>
           <Select
-            labelId="genre-select-label"
+            labelId="type-select-label"
             value={type}
             onChange={(e) => setType(e.target.value)}
-            sx={{ color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'white' } }}
+            sx={{ '.MuiSelect-select': { bgcolor: 'transparent', color: 'white', borderColor: 'white' } }}
           >
-
-            <MenuItem key={0} value={"Top Tracks"}>Top Tracks</MenuItem>
-            <MenuItem key={1} value={"Recently Played"}>Recently Played</MenuItem>
-            {/* <MenuItem key={0} value={"Mood"}>Mood</MenuItem> */}
-
+            <MenuItem value="Top Tracks">Top Tracks</MenuItem>
+            <MenuItem value="Recently Played">Recently Played</MenuItem>
           </Select>
         </FormControl>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={getRecs}
-          sx={{
-            background: 'linear-gradient(to right, #9D50BB, #6E48AA)', // Purple gradient background
-            color: 'white',
-            '&:hover': {
-              background: 'linear-gradient(to right, #9D50BB, #6E48AA)',
-              opacity: 0.9
-            }
-          }}
-        >
-          Get Songs
-        </Button>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
-          <TextField
-            label="Playlist Name"
-            variant="outlined"
-            value={playlistName}
-            onChange={(e) => setPlaylistName(e.target.value)}
-            InputLabelProps={{ style: { color: 'white' } }}
-            InputProps={{ style: { color: 'white' } }}
-            sx={{ marginBottom: '10px' }}
-          />
-          <TextField
-            label="Playlist Description"
-            variant="outlined"
-            value={playlistDescription}
-            onChange={(e) => setPlaylistDescription(e.target.value)}
-            InputLabelProps={{ style: { color: 'white' } }}
-            InputProps={{ style: { color: 'white' } }}
-            sx={{ marginBottom: '10px' }}
-          />
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={createPlaylist}
-          sx={{
-            background: 'linear-gradient(to right, #9D50BB, #6E48AA)', // Matching purple gradient background
-            color: 'white',
-            '&:hover': {
-              background: 'linear-gradient(to right, #9D50BB, #6E48AA)',
-              opacity: 0.9
-            }
-          }}
-        >
-          Create Playlist
-        </Button>
+        <Tooltip title="Fetch recommended songs based on selection" arrow>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={getRecs}
+            sx={{
+              background: 'linear-gradient(to right, #6E48AA, #9D50BB)', 
+              color: 'white',
+              '&:hover': { background: 'linear-gradient(to right, #5C37A3, #8A44AC)' }
+            }}
+          >
+            Fetch Songs
+          </Button>
+        </Tooltip>
+        <Tooltip title="Create a new playlist with fetched songs" arrow>
+          <Button
+            variant="contained"
+            startIcon={<PlaylistAddCheckIcon />}
+            onClick={createPlaylist}
+            sx={{
+              background: 'linear-gradient(to right, #6E48AA, #9D50BB)', 
+              color: 'white',
+              '&:hover': { background: 'linear-gradient(to right, #5C37A3, #8A44AC)' }
+            }}
+          >
+            Create Playlist
+          </Button>
+        </Tooltip>
       </Box>
-
+      
       {hasPlay && playlist && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
           <iframe
