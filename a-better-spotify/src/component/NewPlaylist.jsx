@@ -98,13 +98,17 @@ function NewPlaylist({ token, setToken }) {
     handleCloseModal()
     if (!recommendations.length) return;
 
+    const defaultPlaylistName = "My New Playlist";
+    const defaultPlaylistDescription = "A playlist created from recommendations.";
+    
     const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET');
     const playlistResponse = await fetchWebApi(
       token, `v1/users/${user_id}/playlists`, 'POST', {
-        name: "My New Playlist",
-        description: "A playlist created from recommendations.",
+        name: playlistName || defaultPlaylistName,
+        description: playlistDescription || defaultPlaylistDescription,
         public: false
       });
+    
 
     const tracksUri = recommendations.map(track => `spotify:track:${track.id}`);
     await fetchWebApi(
