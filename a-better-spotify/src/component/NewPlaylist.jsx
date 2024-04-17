@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Paper, Typography, TableContainer, Table, TableHead, TableBody,
   TableRow, TableCell, Box, TextField, FormControl, InputLabel,
-  MenuItem, Select, Button, Tooltip
+  MenuItem, Select, Button, Tooltip, Modal
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
@@ -14,6 +14,23 @@ function NewPlaylist({ token, setToken }) {
   const [hasPlay, setHasPlay] = useState(false);
   const [num, setNum] = useState(30);
   const [type, setType] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [playlistName, setPlaylistName] = useState("");
+  const [playlistDescription, setPlaylistDescription] = useState("");
+
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
+
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+  };
 
 
   // Fetch recommendations based on the selected type
@@ -78,6 +95,7 @@ function NewPlaylist({ token, setToken }) {
 
   // Create a new playlist on Spotify
   async function createPlaylist() {
+    handleCloseModal()
     if (!recommendations.length) return;
 
     const { id: user_id } = await fetchWebApi(token, 'v1/me', 'GET');
@@ -168,7 +186,7 @@ function NewPlaylist({ token, setToken }) {
           <Button
             variant="contained"
             startIcon={<PlaylistAddCheckIcon />}
-            onClick={createPlaylist}
+            onClick={handleOpenModal}
             sx={{
               background: 'linear-gradient(to right, #6E48AA, #9D50BB)', 
               color: 'white',
@@ -179,6 +197,36 @@ function NewPlaylist({ token, setToken }) {
           </Button>
         </Tooltip>
       </Box>
+
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={modalStyle}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Enter Playlist Details
+          </Typography>
+          <TextField
+            fullWidth
+            label="Playlist Name"
+            variant="outlined"
+            value={playlistName}
+            onChange={(e) => setPlaylistName(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Playlist Description"
+            variant="outlined"
+            value={playlistDescription}
+            onChange={(e) => setPlaylistDescription(e.target.value)}
+            sx={{ mt: 2, mb: 2 }}
+          />
+          <Button onClick={createPlaylist} variant="contained" sx={{ background: 'linear-gradient(to right, #6E48AA, #9D50BB)', color: 'white' }}>Create</Button>
+        </Box>
+      </Modal>
       
       {hasPlay && playlist && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
