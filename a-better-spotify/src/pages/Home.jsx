@@ -5,7 +5,6 @@ import CustomMood from '../component/CustomMood';
 import TopTracks from '../component/TopTracks';
 import RecommendedTracks from '../component/RecommendedTracks';
 import TopArtists from '../component/TopArtists';
-import WebPlayback from '../component/WebPlayback';
 
 function Home({ token, setToken }) {
     // Adjusted style for the main container to improve alignment and spacing
@@ -47,7 +46,6 @@ function Home({ token, setToken }) {
               <CustomMood token={token} setToken={setToken} />
             </div> */}
           </div>
-          <WebPlayback token={token} setToken={setToken} />
         </div>
       </>
     );
