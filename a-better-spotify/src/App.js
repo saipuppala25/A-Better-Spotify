@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 import Login from "./Login";
 import Home from "./pages/Home";
-import Visuals from "./Visuals";
 import TopTracksPage from "./pages/TopTracksPage"; // Import the new page component
 import TopBar from "./component/TopBar";
 import TopArtistsPage from "./pages/TopArtistsPage";
@@ -50,35 +49,61 @@ function App() {
             token === "" || token == null ? (
               <Navigate replace to="/" />
             ) : (
-              <Home token={token} setToken={setToken} />
+              <Navigate replace to="/top-tracks" /> // Redirect to Top Tracks page
             )
           }
         />
-        <Route path="/visuals" element={<Visuals />} />
+
         <Route
           path="/top-tracks"
           element={<TopTracksPage token={token} setToken={setToken} />}
-        />{" "}
-        {/* New route */}
+        />
+        {/* New routes */}
+        {[...Array(20)].map((_, index) => (
+          <Route
+            key={index}
+            path={`/button${index + 1}`}
+            element={<LargeObnoxiousButton index={index + 1} />}
+          />
+        ))}
+        {/* End of new routes */}
         <Route
           path="/top-artists"
           element={<TopArtistsPage token={token} setToken={setToken} />}
-        />{" "}
-        {/* New route */}
+        />
         <Route
           path="/playlists"
           element={<RecommendationsPage token={token} setToken={setToken} />}
-        />{" "}
-        {/* New route */}
-        {/* New route */}
+        />
         <Route
           path="/moods"
           element={<MoodsPage token={token} setToken={setToken} />}
-        />{" "}
-        {/* New route */}
+        />
       </Routes>
     </Router>
   );
 }
+
+// Large and obnoxious button component
+const LargeObnoxiousButton = ({ index }) => {
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <button
+        style={{
+          fontSize: "36px",
+          fontWeight: "bold",
+          padding: "20px 50px",
+          backgroundColor: "red",
+          color: "white",
+          border: "none",
+          borderRadius: "10px",
+          cursor: "pointer",
+        }}
+      >
+        Button {index}
+      </button>
+    </div>
+  );
+};
 
 export default App;
