@@ -53,20 +53,10 @@ function App() {
             )
           }
         />
-
         <Route
           path="/top-tracks"
           element={<TopTracksPage token={token} setToken={setToken} />}
         />
-        {/* New routes */}
-        {[...Array(20)].map((_, index) => (
-          <Route
-            key={index}
-            path={`/button${index + 1}`}
-            element={<LargeObnoxiousButton index={index + 1} />}
-          />
-        ))}
-        {/* End of new routes */}
         <Route
           path="/top-artists"
           element={<TopArtistsPage token={token} setToken={setToken} />}
@@ -83,27 +73,5 @@ function App() {
     </Router>
   );
 }
-
-// Large and obnoxious button component
-const LargeObnoxiousButton = ({ index }) => {
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <button
-        style={{
-          fontSize: "36px",
-          fontWeight: "bold",
-          padding: "20px 50px",
-          backgroundColor: "red",
-          color: "white",
-          border: "none",
-          borderRadius: "10px",
-          cursor: "pointer",
-        }}
-      >
-        Button {index}
-      </button>
-    </div>
-  );
-};
 
 export default App;
