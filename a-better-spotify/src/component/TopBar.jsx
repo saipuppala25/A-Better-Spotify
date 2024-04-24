@@ -6,8 +6,8 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
 
-const pages = ['Top Tracks', 'Top Artists', 'Playlists', 'Recommendations'];
-const hrefs = ['/top-tracks', '/top-artists', '/playlists', '/moods'];
+const pages = ['Top Tracks', 'Top Artists', 'Playlists', 'Recommendations', 'Mode'];
+const hrefs = ['/top-tracks', '/top-artists', '/playlists', '/moods', '/mode'];
 
 function TopBar({ token, setToken }) {
   const [anchorElNav, setAnchorElNav] = useState(null);
