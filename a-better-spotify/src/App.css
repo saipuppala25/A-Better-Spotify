@@ -29,3 +29,7 @@ a {
   text-decoration: none;
   color: inherit; /* Inherit text color */
 }
+.dark-mode {
+  background-color: #fffdd0; /* Cream color */
+  color: #ffffff;
+}

@@ -47,9 +47,7 @@ function RecommendedTracks({token, setToken}){
     
        
     
-    useEffect(() => {
-        getTracks();
-      }, []);
+   
 
     async function getTracks() {
       console.log(token)

@@ -6,6 +6,7 @@
 
 
 
+
 export const fetchWebApi = async (token, endpoint, method, body) => {
     try {
         const res = await fetch(`https://api.spotify.com/${endpoint}`, {
@@ -41,6 +42,8 @@ const refreshToken = async () => {
         method: 'POST',
         // Include any necessary data for token refresh (e.g., refresh token)
         body: JSON.stringify({ refreshToken: 'your_refresh_token' }),
+export const fetchWebApi = async (token, endpoint, method, body) => {
+    const res = await fetch(`https://api.spotify.com/${endpoint}`, {
         headers: {
             'Content-Type': 'application/json'
         }
